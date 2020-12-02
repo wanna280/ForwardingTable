@@ -3,7 +3,7 @@ package com.example.demo.utils;
 public class NetBridge {
     int max = 128;   //转发表的最大表项
     static int num = 0;  //转发表当前的表项数目
-    String[][] RoutingTable = new String[max][2];   //转发表
+    String[][] ForwardingTable = new String[max][2];   //转发表
 
     /**
      * 打印当前的转发表情况
@@ -12,13 +12,13 @@ public class NetBridge {
         System.out.println("\tMacAddress\t\tInterface");   //打印转发表的属性列
         for (int i = 0; i < max; i++) {   //遍历转发表
             for (int j = 0; j < 2; j++) {
-                if (RoutingTable[i][j] != null) {
-                    System.out.print(RoutingTable[i][j] + "\t");   //打印出来表项
+                if (ForwardingTable[i][j] != null) {
+                    System.out.print(ForwardingTable[i][j] + "\t");   //打印出来表项
                 }
 
             }
             System.out.println();
-            if (RoutingTable[i][1] == null) break;   //如果大打印到空值，结束打印
+            if (ForwardingTable[i][1] == null) break;   //如果大打印到空值，结束打印
         }
         System.out.print("*******************************************************");
         System.out.println("*******************************************************");
@@ -32,7 +32,7 @@ public class NetBridge {
     public boolean IsSourceMacInTable(DataFrame dataframe) {     //原地址是否在转发表中
         for (int i = 0; i < num; i++) {
             if (dataframe != null) {
-                if (dataframe.destinationMac.equals(RoutingTable[i][0])) {
+                if (dataframe.destinationMac.equals(ForwardingTable[i][0])) {
                     return true;
                 }
             }
@@ -43,13 +43,13 @@ public class NetBridge {
     /**
      * 数据帧的目的地址是否在转发表中，在的话返回索引，不在的话返回-1
      * @param dataframe 数据帧
-     * @return  if in this RoutingTable,return the index of destinationMac of this dataframe
+     * @return  if in this ForwardingTable,return the index of destinationMac of this dataframe
      * @return else return -1
      */
     public int IsDestinationMacInTable(DataFrame dataframe) {   //目的地址是否在转发表中
         for (int i = 0; i < num; i++) {
             if (dataframe != null) {
-                if (dataframe.destinationMac.equals(RoutingTable[i][0])) {
+                if (dataframe.destinationMac.equals(ForwardingTable[i][0])) {
                     return i;
                 }
             }
@@ -62,9 +62,9 @@ public class NetBridge {
      * @param dataframe  数据帧
      * @param Interface  接口
      */
-    public void UpdateRoutingTable(DataFrame dataframe, String Interface) {   //更新转发表
-        RoutingTable[num][0] = dataframe.sourceMac;   //0位置存放源mac
-        RoutingTable[num][1] = Interface;   //1位置存放对应的接口
+    public void UpdateForwardingTable(DataFrame dataframe, String Interface) {   //更新转发表
+        ForwardingTable[num][0] = dataframe.sourceMac;   //0位置存放源mac
+        ForwardingTable[num][1] = Interface;   //1位置存放对应的接口
         num += 1;   //转发表的表项+1
     }
 
@@ -78,19 +78,19 @@ public class NetBridge {
         if (dataframe.sourceMac != null && dataframe.destinationMac != null) {
             System.out.println("Dataframe has been recieved,its sourceMac is "+dataframe.sourceMac+" and the destinationMac is "+dataframe.destinationMac);
             if (IsDestinationMacInTable(dataframe) == -1) {   //如果数据帧的目的地址不在转发表中，打印相关信息
-                System.out.println("The destinationMac of dataframe is not in RoutingTable,try to send by other interface");
+                System.out.println("The destinationMac of dataframe is not in ForwardingTable,try to send by other interface");
                 if (!IsSourceMacInTable(dataframe)) {  //如果转发表当中不存在接收数据帧的源地址，将源地址加入转发表
-                    UpdateRoutingTable(dataframe, Interface);  //自学习，进行更新
+                    UpdateForwardingTable(dataframe, Interface);  //自学习，进行更新
                 }
             } else {     //如果数据真的目的地址在转发表中，打印相关信息
                 if (!IsSourceMacInTable(dataframe)) {   //如果转发表当中不存在接收数据帧的源地址，将源地址加入转发表
-                    UpdateRoutingTable(dataframe, Interface);  //自学习，进行更新
+                    UpdateForwardingTable(dataframe, Interface);  //自学习，进行更新
                 }
-                System.out.println("It can be find in the RoutingTable");
-                if (RoutingTable[IsDestinationMacInTable(dataframe)][1] == Interface) {   //如果接收端口为发送端口，丢掉数据包
+                System.out.println("It can be find in the ForwardingTable");
+                if (ForwardingTable[IsDestinationMacInTable(dataframe)][1] == Interface) {   //如果接收端口为发送端口，丢掉数据包
                     System.out.println("SourceMac = DestinationMac!It will be threw up!");
                 } else {
-                    System.out.println("It will be send from " + RoutingTable[IsDestinationMacInTable(dataframe)][1]);
+                    System.out.println("It will be send from " + ForwardingTable[IsDestinationMacInTable(dataframe)][1]);
                     System.out.println();
                 }
             }
