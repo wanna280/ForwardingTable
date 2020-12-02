@@ -8,7 +8,7 @@ public class NetBridge {
     /**
      * 打印当前的转发表情况
      */
-    public void ShowTable() {    //打印当前的转发表的情况
+    public void ShowForwardingTable() {    //打印当前的转发表的情况
         System.out.println("\tMacAddress\t\tInterface");   //打印转发表的属性列
         for (int i = 0; i < max; i++) {   //遍历转发表
             for (int j = 0; j < 2; j++) {
@@ -94,7 +94,7 @@ public class NetBridge {
                     System.out.println();
                 }
             }
-            ShowTable();
+            ShowForwardingTable();
         }
     }
 
